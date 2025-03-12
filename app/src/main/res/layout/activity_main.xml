@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="?attr/colorBackground">
+
+    <TextView android:id="@+id/theme_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="テーマを確認中..."
+        android:textSize="24sp" />
+
+    <TextView android:id="@+id/oil_temp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="油温: --°C"
+        android:textSize="24sp" />
+
+    <TextView android:id="@+id/coolant_temp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="水温: --°C"
+        android:textSize="24sp" />
+
+    <TextView android:id="@+id/torque"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="トルク: --Nm"
+        android:textSize="24sp" />
+
+    <TextView android:id="@+id/power"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="馬力: --PS"
+        android:textSize="24sp" />
+</LinearLayout>
