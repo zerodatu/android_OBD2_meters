@@ -4,41 +4,47 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="20dp"
-    android:background="?attr/colorBackground">
+    android:background="?attr/colorBackground"
+    android:gravity="center"> <!-- 🔥 中央寄せにする -->
 
     <TextView
         android:id="@+id/theme_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/theme_status"
-        android:textSize="24sp" />
+        android:textSize="32sp"
+        android:layout_marginBottom="32dp"/> <!-- 🔥 下に余白を追加 -->
 
     <TextView
         android:id="@+id/oil_temp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/oil_temp"
-        android:textSize="24sp" />
+        android:textSize="32sp"
+        android:layout_marginTop="16dp"/> <!-- 🔥 各項目の間隔を広げる -->
 
     <TextView
         android:id="@+id/coolant_temp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/coolant_temp"
-        android:textSize="24sp" />
+        android:textSize="32sp"
+        android:layout_marginTop="16dp"/>
 
     <TextView
         android:id="@+id/torque"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/torque"
-        android:textSize="24sp" />
+        android:textSize="32sp"
+        android:layout_marginTop="16dp"/>
 
     <TextView
         android:id="@+id/power"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/power"
-        android:textSize="24sp" />
+        android:textSize="32sp"
+        android:layout_marginTop="16dp"/>
 
 </LinearLayout>
