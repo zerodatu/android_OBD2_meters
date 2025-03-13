@@ -3,6 +3,7 @@ package com.example.android_obd2_meters
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
@@ -14,9 +15,12 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.*
+import androidx.core.content.ContextCompat
+import android.Manifest
+import android.os.Build
 
 class MainActivity : AppCompatActivity() {
-    private val OBD_UUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
+    private val obdUuid: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
     private var bluetoothSocket: BluetoothSocket? = null
     private var outputStream: OutputStream? = null
     private var inputStream: InputStream? = null
@@ -54,7 +58,23 @@ class MainActivity : AppCompatActivity() {
 
         themeStatusView.text = if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES) "ダークモード適用中" else "ライトモード適用中"
 
+        checkBluetoothPermission()
         connectToOBD()
+        connectToOBD()
+    }
+
+    private fun checkBluetoothPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // Android 12 (API 31) 以上
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+                != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(arrayOf(Manifest.permission.BLUETOOTH_CONNECT), 1)
+            }
+        } else { // Android 11 (API 30) 以下
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH)
+                != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(arrayOf(Manifest.permission.BLUETOOTH), 1)
+            }
+        }
     }
 
     private fun connectToOBD() {
@@ -65,20 +85,39 @@ class MainActivity : AppCompatActivity() {
             Thread {
                 while (bluetoothSocket == null) {
                     try {
-                        bluetoothSocket = device.createRfcommSocketToServiceRecord(OBD_UUID)
-                        bluetoothSocket?.connect()
-                        outputStream = bluetoothSocket?.outputStream
-                        inputStream = bluetoothSocket?.inputStream
-                        startReadingOBD()
-                    } catch (e: IOException) {
-                        bluetoothSocket = null
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // Android 12 (API 31) 以上
+                            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+                                == PackageManager.PERMISSION_GRANTED) {
+
+                                bluetoothSocket = device.createRfcommSocketToServiceRecord(obdUuid)
+                                bluetoothSocket?.connect()
+                                outputStream = bluetoothSocket?.outputStream
+                                inputStream = bluetoothSocket?.inputStream
+                                startReadingOBD()
+                            } else {
+                                requestPermissions(arrayOf(Manifest.permission.BLUETOOTH_CONNECT), 1)
+                            }
+                        } else { // Android 11 (API 30) 以下
+                            bluetoothSocket = device.createRfcommSocketToServiceRecord(obdUuid)
+                            bluetoothSocket?.connect()
+                            outputStream = bluetoothSocket?.outputStream
+                            inputStream = bluetoothSocket?.inputStream
+                            startReadingOBD()
+                        }
+                    } catch (e: SecurityException) {
                         e.printStackTrace()
+                        bluetoothSocket = null
+                        Thread.sleep(5000) // 再接続
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                        bluetoothSocket = null
                         Thread.sleep(5000) // 再接続
                     }
                 }
             }.start()
         }
     }
+
 
     private fun startReadingOBD() {
         obdHandler.post(object : Runnable {
