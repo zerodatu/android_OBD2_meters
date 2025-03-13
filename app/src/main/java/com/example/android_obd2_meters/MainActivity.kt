@@ -56,8 +56,8 @@ class MainActivity : AppCompatActivity() {
 
         // ダークモードかどうかを `AppCompatDelegate.getDefaultNightMode()` で判定
         themeStatusView.text = when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
-            Configuration.UI_MODE_NIGHT_YES -> "ダークモード適用中"
-            else -> "ライトモード適用中"
+            Configuration.UI_MODE_NIGHT_YES -> "Dark mode applied"
+            else -> "Light mode applied"
         }
 
         checkBluetoothPermission()
@@ -83,7 +83,7 @@ class MainActivity : AppCompatActivity() {
         val bluetoothManager = getSystemService(BluetoothManager::class.java)
         val bluetoothAdapter: BluetoothAdapter? = bluetoothManager?.adapter
         val device: BluetoothDevice? = bluetoothAdapter?.bondedDevices?.find { it.name.contains("OBD") } ?: run {
-            Log.e("Bluetooth", "OBDデバイスが見つかりません")
+            Log.e("Bluetooth", "Not found OBD device")
             null
         }
 
@@ -142,10 +142,6 @@ class MainActivity : AppCompatActivity() {
                     if (power > maxPower) maxPower = power
 
                     handler.post {
-//                        oilTempView.text = "油温: ${oilTemp}°C"
-//                        coolantTempView.text = "水温: ${coolantTemp}°C"
-//                        torqueView.text = "トルク: ${String.format("%.1f", torque)} Nm"
-//                        powerView.text = "馬力: ${String.format("%.1f", power)} PS"
                         oilTempView.text = getString(R.string.oil_temp, oilTemp)
                         coolantTempView.text = getString(R.string.coolant_temp, coolantTemp)
                         torqueView.text = getString(R.string.torque, torque)
