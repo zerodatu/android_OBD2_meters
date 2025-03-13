@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">android_OBD2_meters</string>
-    <string name="oil_temp">油温: %1$d°C</string>
-    <string name="coolant_temp">水温: %1$d°C</string>
-    <string name="torque">トルク: %1$.1f Nm</string>
-    <string name="power">馬力: %1$.1f PS</string>
-    <string name="theme_status">テーマを確認中...</string>
+    <string name="oil_temp">OilTemp: %1$d°C</string>
+    <string name="coolant_temp">CoolantTemp: %1$d°C</string>
+    <string name="torque">Torque: %1$.1f Nm</string>
+    <string name="power">Power: %1$.1f PS</string>
+    <string name="theme_status">Check user theme…</string>
 </resources>
