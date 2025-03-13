@@ -2,4 +2,6 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="colorBackgroundLight">#FFFFFF</color> <!-- ライトモード背景 -->
+    <color name="colorBackgroundDark">#121212</color> <!-- ダークモード背景 -->
 </resources>

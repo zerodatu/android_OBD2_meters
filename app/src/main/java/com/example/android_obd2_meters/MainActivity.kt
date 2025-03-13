@@ -17,7 +17,9 @@ import java.io.OutputStream
 import java.util.*
 import androidx.core.content.ContextCompat
 import android.Manifest
+import android.bluetooth.BluetoothManager
 import android.os.Build
+import android.util.Log
 
 class MainActivity : AppCompatActivity() {
     private val obdUuid: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
@@ -40,12 +42,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 🌙 ダークモード設定
-        val nightModeFlags = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-        when (nightModeFlags) {
-            Configuration.UI_MODE_NIGHT_YES -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            Configuration.UI_MODE_NIGHT_NO, Configuration.UI_MODE_NIGHT_UNDEFINED -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        }
+        // 🌙 システムのダークモード設定に従う
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
 
         setContentView(R.layout.activity_main)
 
@@ -56,30 +54,39 @@ class MainActivity : AppCompatActivity() {
         torqueView = findViewById(R.id.torque)
         powerView = findViewById(R.id.power)
 
-        themeStatusView.text = if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES) "ダークモード適用中" else "ライトモード適用中"
+        // ダークモードかどうかを `AppCompatDelegate.getDefaultNightMode()` で判定
+        themeStatusView.text = when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+            Configuration.UI_MODE_NIGHT_YES -> "ダークモード適用中"
+            else -> "ライトモード適用中"
+        }
 
         checkBluetoothPermission()
         connectToOBD()
-        connectToOBD()
     }
 
+
     private fun checkBluetoothPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // Android 12 (API 31) 以上
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
-                != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(arrayOf(Manifest.permission.BLUETOOTH_CONNECT), 1)
-            }
-        } else { // Android 11 (API 30) 以下
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH)
-                != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(arrayOf(Manifest.permission.BLUETOOTH), 1)
-            }
+        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            Manifest.permission.BLUETOOTH_CONNECT
+        } else {
+            Manifest.permission.BLUETOOTH
+        }
+
+        if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(permission), 1)
         }
     }
 
+
     private fun connectToOBD() {
-        val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
-        val device: BluetoothDevice? = bluetoothAdapter.bondedDevices.find { it.name.contains("OBD") }
+//        val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+        val bluetoothManager = getSystemService(BluetoothManager::class.java)
+        val bluetoothAdapter: BluetoothAdapter? = bluetoothManager?.adapter
+        val device: BluetoothDevice? = bluetoothAdapter?.bondedDevices?.find { it.name.contains("OBD") } ?: run {
+            Log.e("Bluetooth", "OBDデバイスが見つかりません")
+            null
+        }
+
 
         if (device != null) {
             Thread {
@@ -135,10 +142,15 @@ class MainActivity : AppCompatActivity() {
                     if (power > maxPower) maxPower = power
 
                     handler.post {
-                        oilTempView.text = "油温: ${oilTemp}°C"
-                        coolantTempView.text = "水温: ${coolantTemp}°C"
-                        torqueView.text = "トルク: ${String.format("%.1f", torque)} Nm"
-                        powerView.text = "馬力: ${String.format("%.1f", power)} PS"
+//                        oilTempView.text = "油温: ${oilTemp}°C"
+//                        coolantTempView.text = "水温: ${coolantTemp}°C"
+//                        torqueView.text = "トルク: ${String.format("%.1f", torque)} Nm"
+//                        powerView.text = "馬力: ${String.format("%.1f", power)} PS"
+                        oilTempView.text = getString(R.string.oil_temp, oilTemp)
+                        coolantTempView.text = getString(R.string.coolant_temp, coolantTemp)
+                        torqueView.text = getString(R.string.torque, torque)
+                        powerView.text = getString(R.string.power, power)
+
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
